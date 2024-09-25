@@ -2,5 +2,11 @@
 
 <h1> ACA Book Recommendations </h1>
 
+<h2> Past Years </h2>
+
+<% years.forEach(year => { %>
+    <a href="/<%=year%>"><h3><%=year%></h3></a>
+
+<% }) %>
 
 <%- include('partials/footer.ejs'); -%>
