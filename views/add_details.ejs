@@ -1,0 +1,19 @@
+<%- include('partials/header.ejs'); -%>
+
+<div>
+    <form action="/books/save" method="post">
+        <img src="<%=book.imageUrlMedium%>">
+        <h4><%= book.author %> - <%= book.title %> (<%= book.year %>)</h4>
+        <label for="year">ACA Year: </label>
+        <input type="number" name="year" value="2024">
+        <br>
+        <label fo="recommendedBy">Recommended By: </label>
+        <input type="text" name="recommendedBy">
+        <br>
+        <textarea name="aca_notes" placeholder="Enter notes here" rows="40" cols="100"></textarea>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
+<%- include('partials/footer.ejs'); -%>

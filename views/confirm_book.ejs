@@ -1,0 +1,15 @@
+<%- include('partials/header.ejs'); -%>
+
+<div>
+    <form action="/books/add" method="post">
+        <% books.forEach((book) => { %>
+            <img src="<%=book.imageUrl%>">
+            <input type="radio" name="books" id="<%=book.id%>" value="<%=book.idType%>=<%=book.id%>">
+            <label for="<%=book.id%>"><%=book.author_name%> - <%=book.title%> (<%=book.first_publish_year%>) </label>
+            <br>
+        <% }) %>
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
+<%- include('partials/footer.ejs'); -%>
