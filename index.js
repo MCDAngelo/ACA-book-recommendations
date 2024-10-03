@@ -45,6 +45,7 @@ app.post("/books/find", async (req, res) => {
         const title = req.body.title.replace(/ /g,"+");
         searchEndpoint += "&title=" + title;
     }
+    console.log(`Searching for books from ${searchEndpoint}`);
     const response = await axios.get(searchEndpoint);
     var cleanedBooks = response.data.docs.map((book) => cleanBookInfo(book));
     var filteredBooks = cleanedBooks.filter((book) => book.idType !== null);
