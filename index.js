@@ -1,16 +1,41 @@
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
+import pg from "pg";
 
 const port = 3000;
 const app = express();
 
-const years = [2019, 2020, 2021, 2022, 2023];
+const db = new pg.Client({
+    host: "localhost",
+    port: 5433,
+    database: "aca_website",
+    user: "postgres",
+    password: process.env.POSTGRES_PSWD,
+});
+
+db.connect();
+
+async function getYears() {
+    const response = await db.query("SELECT aca_year from years;");
+    const years = response.rows.map((i) => i.aca_year);
+    return years;
+}
+
+async function getFamily() {
+    const response = await db.query("SELECT first_name from family_members;");
+    const names = response.rows.map((i) => i.first_name);
+    return names;
+}
+
+const familyMembers = await getFamily();
+const years = await getYears();
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
+    console.log(years);
     res.render("index.ejs", {years: years});
 });
 
@@ -75,7 +100,11 @@ app.post("/books/add", async(req, res) => {
         newBook.imageUrlMedium = bookJson.imageUrl.replace("-S.jpg","-M.jpg");
     }
     console.log(newBook);
-    res.render("add_details.ejs", {book: newBook});
+    res.render("add_details.ejs", {book: newBook, family: familyMembers});
+})
+
+app.post("/books/save", (req, res) => {
+    console.log(req.body);
 })
 
 app.get("/:year", (req, res) => {

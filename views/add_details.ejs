@@ -3,17 +3,24 @@
 <div>
     <form action="/books/save" method="post">
         <img src="<%=book.imageUrlMedium%>">
+        <br>
         <label for="author">Author Name: </label>
         <input type="text" name="author" value="<%= book.author %>">
         <label for="title">Book Title: </label>
         <input type="text" name="title" value="<%= book.title %>">
         <label for="bookYear">Publication Year: </label>
         <input type="number" name="bookYear" value="<%= book.year %>">
+        <br>
         <label for="acaYear">ACA Year: </label>
         <input type="number" name="acaYear" value="2024">
         <br>
         <label for="recommendedBy">Recommended By: </label>
-        <input type="text" name="recommendedBy">
+        <select name="recommendedBy" id="family-select">
+            <option value="">--Please choose an option--</option>
+            <% family.forEach((name => { %>
+                <option value="<%= name %>"><%= name %></option>
+            <% })) %>
+        </select>
         <br>
         <textarea name="aca_notes" placeholder="Enter notes here" rows="40" cols="100"></textarea>
         <br>
