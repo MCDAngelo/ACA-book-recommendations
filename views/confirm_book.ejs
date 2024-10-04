@@ -8,6 +8,10 @@
             <label for="<%=book.id%>"><%=book.author_name%> - <%=book.title%> (<%=book.first_publish_year%>) </label>
             <br>
         <% }) %>
+            <img src="/images/manual_entry.png" width="50px">
+            <input type="radio" name="books" id="manualEntry" value="manualEntry">
+            <label for="manualEntry">Add your entry manually.</label>
+
         <input type="submit" value="Submit">
     </form>
 </div>

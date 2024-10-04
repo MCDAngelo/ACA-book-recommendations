@@ -8,6 +8,7 @@ const app = express();
 const years = [2019, 2020, 2021, 2022, 2023];
 
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.static("public"));
 
 app.get("/", (req, res) => {
     res.render("index.ejs", {years: years});
@@ -55,18 +56,24 @@ app.post("/books/find", async (req, res) => {
 
 app.post("/books/add", async(req, res) => {
     console.log(req.body);
-    var searchEndpoint = "https://openlibrary.org/search.json?language=eng";
-    searchEndpoint += "&" + req.body.books;
-    console.log(`Retrieving book information from ${searchEndpoint}`);
-    const searchResponse = await axios.get(searchEndpoint);
-    // TODO: Use google books api to get descriptions https://developers.google.com/books/docs/v1/using#ids
-    const bookJson = cleanBookInfo(searchResponse.data.docs[0]);
-    const newBook = {};
-    newBook.title = bookJson.title;
-    newBook.author = bookJson.author_name;
-    newBook.year = bookJson.first_publish_year;
-    newBook.imageUrl = bookJson.imageUrl;
-    newBook.imageUrlMedium = bookJson.imageUrl.replace("-S.jpg","-M.jpg");
+    const newBook = {
+        title: "",
+        author: "",
+        year: "",
+    };
+    if (req.body.books === "manualEntry") {
+    } else {
+        var searchEndpoint = "https://openlibrary.org/search.json?language=eng";
+        searchEndpoint += "&" + req.body.books;
+        console.log(`Retrieving book information from ${searchEndpoint}`);
+        const searchResponse = await axios.get(searchEndpoint);
+        const bookJson = cleanBookInfo(searchResponse.data.docs[0]);
+        newBook.title = bookJson.title;
+        newBook.author = bookJson.author_name;
+        newBook.year = bookJson.first_publish_year;
+        newBook.imageUrl = bookJson.imageUrl;
+        newBook.imageUrlMedium = bookJson.imageUrl.replace("-S.jpg","-M.jpg");
+    }
     console.log(newBook);
     res.render("add_details.ejs", {book: newBook});
 })

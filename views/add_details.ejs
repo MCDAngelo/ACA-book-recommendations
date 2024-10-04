@@ -3,11 +3,16 @@
 <div>
     <form action="/books/save" method="post">
         <img src="<%=book.imageUrlMedium%>">
-        <h4><%= book.author %> - <%= book.title %> (<%= book.year %>)</h4>
-        <label for="year">ACA Year: </label>
-        <input type="number" name="year" value="2024">
+        <label for="author">Author Name: </label>
+        <input type="text" name="author" value="<%= book.author %>">
+        <label for="title">Book Title: </label>
+        <input type="text" name="title" value="<%= book.title %>">
+        <label for="bookYear">Publication Year: </label>
+        <input type="number" name="bookYear" value="<%= book.year %>">
+        <label for="acaYear">ACA Year: </label>
+        <input type="number" name="acaYear" value="2024">
         <br>
-        <label fo="recommendedBy">Recommended By: </label>
+        <label for="recommendedBy">Recommended By: </label>
         <input type="text" name="recommendedBy">
         <br>
         <textarea name="aca_notes" placeholder="Enter notes here" rows="40" cols="100"></textarea>
