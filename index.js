@@ -1,35 +1,26 @@
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
-import pg from "pg";
+import {Year, FamilyMember, sequelize} from "./models.js";
 
 const port = 3000;
 const app = express();
 
-const db = new pg.Client({
-    host: "localhost",
-    port: 5433,
-    database: "aca_website",
-    user: "postgres",
-    password: process.env.POSTGRES_PSWD,
-});
-
-db.connect();
-
 async function getYears() {
-    const response = await db.query("SELECT aca_year from years;");
-    const years = response.rows.map((i) => i.aca_year);
+    const yearsResponse = await Year.findAll({attributes: ['aca_year']});
+    const years = yearsResponse.map(item => item.getDataValue('aca_year'));
     return years;
 }
 
 async function getFamily() {
-    const response = await db.query("SELECT first_name from family_members;");
-    const names = response.rows.map((i) => i.first_name);
+    const familyResponse = await FamilyMember.findAll({attributes: ['first_name']});
+    const names = familyResponse.map(item => item.getDataValue('first_name'));
     return names;
 }
 
 const familyMembers = await getFamily();
 const years = await getYears();
+console.log(years);
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
