@@ -1,22 +1,10 @@
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
-import {Year, FamilyMember, sequelize} from "./models.js";
+import {Year, FamilyMember, getYears, getFamily, sequelize} from "./models.js";
 
 const port = 3000;
 const app = express();
-
-async function getYears() {
-    const yearsResponse = await Year.findAll({attributes: ['aca_year']});
-    const years = yearsResponse.map(item => item.getDataValue('aca_year'));
-    return years;
-}
-
-async function getFamily() {
-    const familyResponse = await FamilyMember.findAll({attributes: ['first_name']});
-    const names = familyResponse.map(item => item.getDataValue('first_name'));
-    return names;
-}
 
 const familyMembers = await getFamily();
 const years = await getYears();

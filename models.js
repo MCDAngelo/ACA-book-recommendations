@@ -56,8 +56,20 @@ const FamilyMember = sequelize.define(
     },
 );
 
+async function getYears() {
+    const yearsResponse = await Year.findAll({attributes: ['aca_year']});
+    const years = yearsResponse.map(item => item.getDataValue('aca_year'));
+    return years;
+}
+
+async function getFamily() {
+    const familyResponse = await FamilyMember.findAll({attributes: ['first_name']});
+    const names = familyResponse.map(item => item.getDataValue('first_name'));
+    return names;
+}
+
 await Year.sync();
 
 await FamilyMember.sync();
 
-export { Year, FamilyMember, sequelize, };
+export { Year, FamilyMember, getYears, getFamily, sequelize, };
