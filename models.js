@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes, } from "sequelize";
+import { Sequelize, DataTypes } from "sequelize";
 
 const sequelize = new Sequelize({
     dialect: 'postgres',
@@ -18,36 +18,31 @@ try {
 }
 
 const Year = sequelize.define(
-    "Year",
+    "year",
     {
-        id: {
-            type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false,
+        acaYear: {
+            type: DataTypes.INTEGER, allowNull: false, unique: true, primaryKey: true,
         },
-        aca_year: {
-            type: DataTypes.INTEGER, allowNull: false, unique: true,
-        },
-        pantone_color: {
+        pantoneColor: {
             type: DataTypes.STRING(20),
         },
-        pantone_color_hex: {
+        pantoneColorHex: {
             type: DataTypes.STRING(7),
         }
     },
     {
         tableName: 'years',
+        timestamps: false,
     },
 );
 
-const FamilyMember = sequelize.define(
-    "FamilyMember",
+const Family = sequelize.define(
+    "family",
     {
-        id: {
-            type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false,
-        },
-        first_name: {
+        firstName: {
             type: DataTypes.STRING, allowNull: false, unique: 'compositeIndex',
         },
-        last_name: {
+        lastName: {
             type: DataTypes.STRING, allowNull: false, unique: 'compositeIndex',
         }
     },
@@ -56,20 +51,71 @@ const FamilyMember = sequelize.define(
     },
 );
 
+const Book = sequelize.define(
+    "book",
+    {
+        title: {
+            type: DataTypes.STRING, allowNull: false, unique: 'compositeIndex',
+        },
+        author: {
+            type: DataTypes.STRING, allowNull: false, unique: 'compositeIndex',
+        },
+        pubYear: {
+            type: DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex',
+        },
+        imageUrl: {
+            type: DataTypes.STRING, validate: {isUrl: true},
+        },
+    },
+    {
+        tableName: 'books',
+    },
+);
+
+const Recommendation = sequelize.define(
+    "recommendation",
+    {
+        id: {
+            type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false,
+        },
+        familyId : {
+            type: DataTypes.INTEGER, allowNull: false, unique: 'compositeKey',
+        },
+        bookId : {
+            type: DataTypes.INTEGER, allowNull: false, unique: 'compositeKey',
+        },
+        yearAcaYear : {
+            type: DataTypes.INTEGER, allowNull: false, unique: 'compositeKey',
+        },
+        notes: {
+            type: DataTypes.TEXT,
+        },
+    },
+    {
+        tableName: 'recommendations',
+    },
+);
+
+Family.hasMany(Recommendation);
+Year.hasMany(Recommendation);
+Book.hasMany(Recommendation);
+Recommendation.belongsTo(Family);
+Recommendation.belongsTo(Year);
+Recommendation.belongsTo(Book);
+
 async function getYears() {
-    const yearsResponse = await Year.findAll({attributes: ['aca_year']});
-    const years = yearsResponse.map(item => item.getDataValue('aca_year'));
+    const yearsResponse = await Year.findAll();
+    const years = yearsResponse.map(item => item.dataValues);
     return years;
 }
 
 async function getFamily() {
-    const familyResponse = await FamilyMember.findAll({attributes: ['first_name']});
-    const names = familyResponse.map(item => item.getDataValue('first_name'));
+    const familyResponse = await Family.findAll({attributes: ['firstName']});
+    const names = familyResponse.map(item => item.getDataValue('firstName'));
     return names;
 }
 
-await Year.sync();
+await sequelize.sync();
 
-await FamilyMember.sync();
 
-export { Year, FamilyMember, getYears, getFamily, sequelize, };
+export { Book, Family, Recommendation, Year, getFamily, getYears, sequelize, };

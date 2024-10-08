@@ -1,19 +1,18 @@
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
-import {Year, FamilyMember, getYears, getFamily, sequelize} from "./models.js";
+import {Book, Family, Recommendation, Year, getFamily, getYears, sequelize} from "./models.js";
 
 const port = 3000;
 const app = express();
 
 const familyMembers = await getFamily();
-const years = await getYears();
-console.log(years);
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 app.get("/", async (req, res) => {
+    const years = await getYears();
     console.log(years);
     res.render("index.ejs", {years: years});
 });
@@ -63,7 +62,7 @@ app.post("/books/add", async(req, res) => {
     const newBook = {
         title: "",
         author: "",
-        year: "",
+        pubYear: "",
     };
     if (req.body.books === "manualEntry") {
     } else {
@@ -74,7 +73,7 @@ app.post("/books/add", async(req, res) => {
         const bookJson = cleanBookInfo(searchResponse.data.docs[0]);
         newBook.title = bookJson.title;
         newBook.author = bookJson.author_name;
-        newBook.year = bookJson.first_publish_year;
+        newBook.pubYear = bookJson.first_publish_year;
         newBook.imageUrl = bookJson.imageUrl;
         newBook.imageUrlMedium = bookJson.imageUrl.replace("-S.jpg","-M.jpg");
     }
@@ -82,13 +81,43 @@ app.post("/books/add", async(req, res) => {
     res.render("add_details.ejs", {book: newBook, family: familyMembers});
 })
 
-app.post("/books/save", (req, res) => {
-    console.log(req.body);
+app.post("/books/save", async (req, res) => {
+    const formInput = req.body;
+    console.log(formInput);
+    const bookResponse = await Book.findOrCreate({
+        where: {title: formInput.title, author: formInput.author, pubYear: formInput.bookYear, imageUrl: formInput.imageUrl}
+    });
+    const newBook = bookResponse.map(item => item.dataValues)[0];
+    console.log(newBook);
+    const familyMember = await Family.findOne({
+        attributes: ['id'],
+        where: { firstName: formInput.recommendedBy}
+    });
+    console.log(familyMember.dataValues);
+    const newRecommendation = await Recommendation.create({
+        familyId: familyMember.id,
+        bookId: newBook.id,
+        yearAcaYear: formInput.acaYear,
+        notes: formInput.acaNotes  
+    });
+    console.log("Added new recommendation:");
+    console.log(newRecommendation.toJSON());
+    res.redirect("/");
 })
 
-app.get("/:year", (req, res) => {
+app.get("/:year", async (req, res) => {
     console.log(parseInt(req.params.year));
-    res.render("year.ejs");
+    try {
+        const recommendations = await Recommendation.findAll({
+            where: {yearAcaYear: parseInt(req.params.year)},
+            include: Book,
+        })
+        console.log(recommendations.map(rec => rec.toJSON()));
+        res.render("year.ejs", {recommendations: recommendations.map(rec => rec.toJSON())});
+    } catch (err) {
+        console.error(err)
+        res.render("year.ejs", {error: `No matches, pick another year.`});
+    };
 });
 
 app.listen(port, () => {

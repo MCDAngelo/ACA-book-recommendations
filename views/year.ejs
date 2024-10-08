@@ -1,5 +1,12 @@
 <%- include('partials/header.ejs'); -%>
 
-<h2> 🚧 COMING SOON 🚧 </h2>
-
+<% if (locals.error) { %>
+    <h2> 🚧 COMING SOON 🚧 </h2>
+    <p class="error"><%= error %></p>
+<% } else { %>
+    <h2>Books Recommended in <%= recommendations[0].yearAcaYear %> </h2>
+    <% recommendations.forEach((rec) => { %>
+        <p><%= rec.book.title %> </p>
+    <% }); %>
+<% }%>
 <%- include('partials/footer.ejs'); -%>

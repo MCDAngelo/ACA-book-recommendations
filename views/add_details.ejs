@@ -9,7 +9,7 @@
         <label for="title">Book Title: </label>
         <input type="text" name="title" value="<%= book.title %>">
         <label for="bookYear">Publication Year: </label>
-        <input type="number" name="bookYear" value="<%= book.year %>">
+        <input type="number" name="bookYear" value="<%= book.pubYear %>">
         <br>
         <label for="acaYear">ACA Year: </label>
         <input type="number" name="acaYear" value="2024">
@@ -22,7 +22,7 @@
             <% })) %>
         </select>
         <br>
-        <textarea name="aca_notes" placeholder="Enter notes here" rows="40" cols="100"></textarea>
+        <textarea name="acaNotes" placeholder="Enter notes here" rows="40" cols="100"></textarea>
         <br>
         <input type="submit" value="Submit">
     </form>
