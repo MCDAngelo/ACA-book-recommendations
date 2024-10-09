@@ -113,10 +113,14 @@ app.get("/:year", async (req, res) => {
             include: Book,
         })
         console.log(recommendations.map(rec => rec.toJSON()));
-        res.render("year.ejs", {recommendations: recommendations.map(rec => rec.toJSON())});
+        if (recommendations.length > 0) {
+            res.render("year.ejs", {recommendations: recommendations.map(rec => rec.toJSON())});
+        } else {
+            res.render("year.ejs", {error: `No matches, pick another year or add a past recommendation.`});
+        }
     } catch (err) {
         console.error(err)
-        res.render("year.ejs", {error: `No matches, pick another year.`});
+        res.render("year.ejs", {error: `No matches, pick another year or add a past recommendation.`});
     };
 });
 
