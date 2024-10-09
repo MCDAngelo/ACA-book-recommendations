@@ -1,31 +1,93 @@
 <%- include('partials/header.ejs'); -%>
 
 <div>
-    <form action="/books/save" method="post">
-        <img src="<%=book.imageUrlMedium%>">
-        <br>
-        <label for="author">Author Name: </label>
-        <input type="text" name="author" value="<%= book.author %>">
-        <label for="title">Book Title: </label>
-        <input type="text" name="title" value="<%= book.title %>">
-        <label for="bookYear">Publication Year: </label>
-        <input type="number" name="bookYear" value="<%= book.pubYear %>">
-        <br>
-        <label for="acaYear">ACA Year: </label>
-        <input type="number" name="acaYear" value="2024">
-        <br>
-        <label for="recommendedBy">Recommended By: </label>
-        <select name="recommendedBy" id="family-select">
-            <option value="">--Please choose an option--</option>
-            <% family.forEach((name => { %>
-                <option value="<%= name %>"><%= name %></option>
-            <% })) %>
-        </select>
-        <br>
-        <textarea name="acaNotes" placeholder="Enter notes here" rows="40" cols="100"></textarea>
-        <br>
-        <input type="submit" value="Submit">
-    </form>
+    <main>
+        <div class="py-3 text-center">
+          <h3>Finalize Your Recommendation</h3>
+          <p class="lead">Add your notes, confirm the book details, and add ACA year and recommender information.</p>
+        </div>
+        <div class="container">    
+        <div class="row g-5">
+          <div class="col-md-5 col-lg-4 order-md-last">
+            <h4 class="d-flex justify-content-between align-items-center mb-3">
+              <span class="text-primary">Cover Image</span>
+            </h4>
+            <form class="needs-validation" novalidate="" action="/books/save" method="post">
+            <ul class="list-group mb-3">
+              <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
+                <div class="text-success">
+                  <img src="<%=book.imageUrlMedium%>">
+                  <h6 class="my-0">Image URL</h6>
+                  <input type="text" name="imageUrl" class="form-control" value="<%= book.imageUrlMedium %>">
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-7 col-lg-8">
+            <h5 class="mb-3">Book Details</h5>
+              <div class="row g-3">
+                <div class="col-sm-5">
+                    <label for="author" class="form-label">Author Name</label>
+                    <input type="text" name="author" class="form-control" value="<%= book.author %>" required="">
+                  <!-- <label for="firstName" class="form-label">First name</label>
+                  <input type="text" class="form-control" id="firstName" placeholder="" value="" required=""> -->
+                  <div class="invalid-feedback">
+                    Author name is required.
+                  </div>
+                </div>
+    
+                <div class="col-sm-5">
+                  <label for="title" class="form-label">Book Title</label>
+                  <input type="text" name="title" class="form-control" value="<%= book.title %>" required="">
+                  <div class="invalid-feedback">
+                    Book title is required.
+                  </div>
+                </div>
+
+                <div class="col-sm-2">
+                  <label for="bookYear" class="form-label">Publication Year</label>
+                  <input type="number" name="bookYear" class="form-control" value="<%= book.pubYear %>" required="">
+                  <div class="invalid-feedback">
+                      Publication year is required.
+                  </div>
+                </div>
+            </div>
+            <hr class="my-4">
+            <h5 class="mb-3">ACA Details</h5>
+                <div class="row g-3">
+                <div class="col-sm-2">
+                    <label for="acaYear" class="form-label">ACA Year</label>
+                    <input type="number" name="acaYear" class="form-control" value="2024" required="">
+                    <div class="invalid-feedback">
+                        ACA year is required.
+                    </div>
+                </div>
+    
+                <div class="col-4">
+                  <label for="recommendedBy" class="form-label">Recommended By</label>
+                  <select class="form-select" name="recommendedBy" id="family-select" required="">
+                    <option value="">Choose...</option>
+                    <% family.forEach((name => { %>
+                        <option value="<%= name %>"><%= name %></option>
+                    <% })) %>
+                  </select>
+                  <div class="invalid-feedback">
+                    Please indicate who recommended this book.
+                  </div>
+                </div>
+              </div>
+    
+              <hr class="my-4">
+    
+              <div class="col-12">
+                <textarea name="acaNotes" placeholder="Enter notes here" class="form-control"></textarea>
+              </div>
+              <button class="btn btn-primary btn-lg my-4" type="submit">Save Recommendation</button>
+            </form>
+          </div>
+          </div>
+        </div>
+      </main>
 </div>
 
 <%- include('partials/footer.ejs'); -%>

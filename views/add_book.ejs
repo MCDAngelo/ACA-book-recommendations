@@ -1,11 +1,59 @@
 <%- include('partials/header.ejs'); -%>
 
 <div>
-    <form action="/books/find" method="post">
-        <input type="text" name="author" placeholder="Enter Author">
-        <input type="text" name="title" placeholder="Enter Title">
-        <input type="submit" value="Submit">
-    </form>
+    <main class="mb-5">
+        <div class="py-3 text-center">
+          <h3>Add a book</h3>
+          <p class="lead">Searching for a book to retrieve metadata, including cover art, or enter the information manually.</p>
+        </div>
+        <div class="container">
+          <div class="d-grid gap-2 d-md-flex justify-content-center pb-4">
+            <button type="button" id="searchButton" class="btn btn-outline-primary btn-lg px-4 add-book" data-bs-toggle="button">Search</button>
+            <button type="button" id="manualButton" class="btn btn-outline-secondary btn-lg px-4 me-md-2 add-book" data-bs-toggle="button">Manual Entry</button>
+
+          </div>
+          <div class="col" id="searchButtonForm" hidden>
+            <form action="/books/find" method="post">
+              <div class="row g-3">
+                <div class="col-sm-5">
+                    <label for="author" class="form-label">Author Name</label>
+                    <input type="text" name="author" class="form-control" placeholder="Enter Author">
+                </div>
+    
+                <div class="col-sm-5">
+                  <label for="title" class="form-label">Book Title</label>
+                  <input type="text" name="title" class="form-control" placeholder="Enter Title">
+                </div>
+                <!-- OR ADD IN ISBN? DIRECTLY -->
+            </div>
+            <button class="btn btn-primary btn-lg my-4" type="submit">Continue</button>
+            </form>
+          </div>
+          <div class="col" id="manualButtonForm" hidden>
+            <form action="/books/manual" method="post">
+              <div class="row g-3">
+                <div class="col-sm-5">
+                    <label for="author" class="form-label">Author Name</label>
+                    <input type="text" name="author" class="form-control" placeholder="Enter Author">
+                </div>
+                <div class="col-sm-5">
+                  <label for="title" class="form-label">Book Title</label>
+                  <input type="text" name="title" class="form-control" placeholder="Enter Title">
+                </div>
+                <div class="col-sm-2">
+                    <label for="pubYear" class="form-label">Publication Year</label>
+                    <input type="number" name="pubYear" class="form-control" placeholder="">
+                </div>
+                <div class="col-sm-5">
+                    <label for="imageUrl" class="form-label">Cover image (url)</label>
+                    <input type="url" name="imageUrl" class="form-control" placeholder="">
+                </div>
+            </div>
+            <button class="btn btn-primary btn-lg my-4" type="submit">Continue</button>
+            </form>
+          </div>
+        </div>
+      </main>
 </div>
 
 <%- include('partials/footer.ejs'); -%>

@@ -1,19 +1,29 @@
 <%- include('partials/header.ejs'); -%>
 
-<div>
-    <form action="/books/add" method="post">
-        <% books.forEach((book) => { %>
-            <img src="<%=book.imageUrl%>">
-            <input type="radio" name="books" id="<%=book.id%>" value="<%=book.idType%>=<%=book.id%>">
-            <label for="<%=book.id%>"><%=book.author_name%> - <%=book.title%> (<%=book.first_publish_year%>) </label>
-            <br>
-        <% }) %>
-            <img src="/images/manual_entry.png" width="50px">
-            <input type="radio" name="books" id="manualEntry" value="manualEntry">
-            <label for="manualEntry">Add your entry manually.</label>
-        <br>
-        <input type="submit" value="Submit">
-    </form>
-</div>
+<body class="bg-body-tertiary"></body>
+
+<div class="container">
+  <main class="mb-5">
+    <div class="py-5 text-center">
+      <h2>Search Results</h2>
+      <p class="lead">Here are the results from your search. Pick a book to continue to the details page, or add the information manually.</p>
+    </div>
+
+    <div class="row g-5">
+      <div class="col-md-7 col-lg-8">
+        <h4 class="mb-3">Search Results</h4>
+        <form action="/books/add" method="post"">
+            <% books.forEach((book) => { %>
+                <div class="mt-1">
+                    <img src="<%=book.imageUrl%>">
+                    <input type="radio" name="books" id="<%=book.id%>" value="<%=book.idType%>=<%=book.id%>">
+                    <label for="<%=book.id%>"><%=book.author_name%> - <%=book.title%> (<%=book.first_publish_year%>) </label>
+                </div>
+            <% }) %>
+          <button class="btn btn-primary btn-lg" type="submit">Continue to add notes on your recommendation.</button>
+        </form>
+      </div>
+    </div>
+  </main>
 
 <%- include('partials/footer.ejs'); -%>

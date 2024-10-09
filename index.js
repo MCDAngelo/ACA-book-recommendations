@@ -79,6 +79,18 @@ app.post("/books/add", async(req, res) => {
     res.render("add_details.ejs", {book: newBook, family: familyMembers});
 })
 
+app.post("/books/manual", async (req, res) => {
+    const formInput = req.body;
+    console.log(formInput);
+    const newBook = {
+        title: formInput.title,
+        author: formInput.author,
+        pubYear: formInput.pubYear,
+        imageUrl : formInput.imageUrl,
+    };
+    res.render("add_details.ejs", {book: newBook, family: familyMembers});
+})
+
 app.post("/books/save", async (req, res) => {
     const formInput = req.body;
     console.log(formInput);
