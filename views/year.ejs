@@ -1,12 +1,20 @@
 <%- include('partials/header.ejs'); -%>
 
-<% if (locals.error) { %>
-    <h2> 🚧 COMING SOON 🚧 </h2>
-    <p class="error"><%= error %></p>
-<% } else { %>
-    <h2>Books Recommended in <%= recommendations[0].yearAcaYear %> </h2>
-    <% recommendations.forEach((rec) => { %>
-        <p><%= rec.book.title %> </p>
-    <% }); %>
-<% }%>
+<div class="container mb-5">
+    <% if (locals.error) { %>
+        <h2> 🚧 COMING SOON 🚧 </h2>
+        <p class="error"><%= error %></p>
+    <% } else if (locals.recommendations) { %>
+        <h2>Books Recommended in <%= recommendations[0].yearAcaYear %> </h2>
+        <% recommendations.forEach((rec) => { %>
+            <div class="card" style="width: 20rem;">
+                <img src="<%= rec.book.imageUrl %>" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <p class="card-text"><%= rec.book.title %> by <%= rec.book.author %> (<%= rec.book.pubYear %>)</p>
+                </div>
+              </div>
+        <% }); %>
+    <% }%>
+</div>
+
 <%- include('partials/footer.ejs'); -%>

@@ -12,9 +12,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
 app.get("/", async (req, res) => {
-    const years = await getYears();
-    console.log(years);
-    res.render("index.ejs", {years: years});
+    res.render("index.ejs");
 });
 
 app.get("/books/new", (req, res) => {
@@ -105,7 +103,13 @@ app.post("/books/save", async (req, res) => {
     res.redirect("/");
 })
 
-app.get("/:year", async (req, res) => {
+app.get("/years", async (req, res) => {
+    const years = await getYears();
+    console.log(years);
+    res.render("years.ejs", {years: years});
+})
+
+app.get("/years/:year", async (req, res) => {
     console.log(parseInt(req.params.year));
     try {
         const recommendations = await Recommendation.findAll({

@@ -1,11 +1,21 @@
 <%- include('partials/header.ejs'); -%>
 
+<div class="container col-xxl-8 px-4 py-5">
+  <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+    <div class="col-10 col-sm-8 col-lg-6">
+      <img src="bootstrap-themes.png" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy">
+    </div>
+    <div class="col-lg-6">
+      <h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">ACA Archive</h1>
+      <p class="lead">Look up past recommendations made for the Aufricht family's annual Culture Awards.</p>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+        <!-- Change to a login button that says Login to visit the archive or add a book -->
+        <a type="button" href="/years" class="btn btn-primary btn-lg px-4 me-md-2">Visit the Archive</a>
+        <a type="button" href="/books/new" class="btn btn-outline-secondary btn-lg px-4">Add a Book</a>
+      </div>
+    </div>
+  </div>
+</div>
 
-<h2> Past Years </h2>
-
-<% years.forEach(year => { %>
-    <a href="/<%=year%>"><h3><%=year%></h3></a>
-
-<% }) %>
 
 <%- include('partials/footer.ejs'); -%>

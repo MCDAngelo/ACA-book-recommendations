@@ -1,0 +1,20 @@
+<%- include('partials/header.ejs'); -%>
+
+
+<main class="flex-shrink-0">
+    <div class="container">
+      <h1 class="mt-5">Past Years</h1>
+      <div class="d-flex flex-row p-2 gap-2 py-md-3 align-items-center justify-content-center">
+        <% years.forEach(year => { %>
+          <div class="card" onclick="location.href='years/<%=year.acaYear%>'" style="width: 10rem; background-color: <%=year.pantoneColorHex+'50'%>;">
+            <div class="card-body">
+              <h3 class="card-title"><%=year.acaYear%></h3>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+</main>
+
+
+<%- include('partials/footer.ejs'); -%>
