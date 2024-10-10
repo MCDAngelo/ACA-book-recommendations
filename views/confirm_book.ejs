@@ -15,9 +15,9 @@
         <form action="/books/add" method="post"">
             <% books.forEach((book) => { %>
                 <div class="mt-1">
-                    <img src="<%=book.imageUrl%>">
-                    <input type="radio" name="books" id="<%=book.id%>" value="<%=book.idType%>=<%=book.id%>">
-                    <label for="<%=book.id%>"><%=book.author_name%> - <%=book.title%> (<%=book.first_publish_year%>) </label>
+                    <img src="<%=book.volumeInfo.imageLinks.thumbnail%>">
+                    <input type="radio" name="books" id="<%=book.id%>" value="<%=book.id%>">
+                    <label for="<%=book.id%>"><%=book.volumeInfo.authors[0]%> - <%=book.volumeInfo.title%> (<%=book.volumeInfo.publishedData%>) </label>
                 </div>
             <% }) %>
           <button class="btn btn-primary btn-lg" type="submit">Continue to add notes on your recommendation.</button>

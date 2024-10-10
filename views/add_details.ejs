@@ -16,9 +16,10 @@
             <ul class="list-group mb-3">
               <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
                 <div class="text-success">
-                  <img src="<%=book.imageUrlMedium%>">
+                  <img src="<%=book.imageUrl%>">
                   <h6 class="my-0">Image URL</h6>
-                  <input type="text" name="imageUrl" class="form-control" value="<%= book.imageUrlMedium %>">
+                  <input type="text" name="imageUrl" class="form-control" value="<%= book.imageUrl %>">
+                  <input type="text" name="googleId" class="form-control" value="<%= book.googleId %>" hidden>
                 </div>
               </li>
             </ul>

@@ -64,8 +64,11 @@ const Book = sequelize.define(
             type: DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex',
         },
         imageUrl: {
-            type: DataTypes.STRING, validate: {isUrl: true},
+            type: DataTypes.TEXT, validate: {isUrl: true},
         },
+        googleBooksId: {
+            type: DataTypes.STRING, allowNull: true,
+        }
     },
     {
         tableName: 'books',

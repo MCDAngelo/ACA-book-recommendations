@@ -20,66 +20,53 @@ app.get("/books/new", (req, res) => {
     res.render("add_book.ejs");
 });
 
-function cleanBookInfo(book) {
-    if (book.lccn) {
-        book.idType = "lccn";
-        book.id = book.lccn[0];
-    } else if (book.oclc) {
-        book.idType = "oclc";
-        book.id = book.oclc[0];
-    } else {
-        book.idType = null;
-        book.imageUrl = null;
-    }
-    book.imageUrl = `https://covers.openlibrary.org/b/${book.idType}/${book.id}-S.jpg`;
-    return book;
+function getPublicationYear(pubDateStr) {
+    const pubDate = new Date(pubDateStr);
+    return pubDate.getFullYear();
 }
 
 app.post("/books/find", async (req, res) => {
     console.log("Looking for book");
     console.log(req.body);
-    var searchEndpoint = "https://openlibrary.org/search.json?language=eng";
-    if (req.body.author) {
+    var searchEndpoint = "https://www.googleapis.com/books/v1/volumes?q=";
+    if (req.body.author !== "") {
         const author = req.body.author.replace(/ /g,"+");
-        searchEndpoint += "&author=" + author;
+        searchEndpoint += "+inauthor:" + author;
     }
-    if (req.body.title) {
+    if (req.body.title !== "") {
         const title = req.body.title.replace(/ /g,"+");
-        searchEndpoint += "&title=" + title;
+        searchEndpoint += "+intitle:" + title;
     }
+    searchEndpoint += "&key=" + process.env.GOOGLE_BOOKS_API_KEY;
     console.log(`Searching for books from ${searchEndpoint}`);
     const response = await axios.get(searchEndpoint);
-    var cleanedBooks = response.data.docs.map((book) => cleanBookInfo(book));
-    var filteredBooks = cleanedBooks.filter((book) => book.idType !== null);
+    var rawBooks = response.data.items;
+    var filteredBooks = rawBooks.filter((book) => "imageLinks" in book.volumeInfo);
     console.log(filteredBooks.length);
     res.render("confirm_book.ejs", {books:filteredBooks})
 });
 
 app.post("/books/add", async(req, res) => {
     console.log(req.body);
+    var searchEndpoint = "https://www.googleapis.com/books/v1/volumes/";
+    searchEndpoint += req.body.books + "?key=" + process.env.GOOGLE_BOOKS_API_KEY;
+    console.log(`Retrieving book information from ${searchEndpoint}`);
+    const searchResponse = await axios.get(searchEndpoint);
+    const bookJson = searchResponse.data.volumeInfo;
+    console.log(bookJson)
     const newBook = {
-        title: "",
-        author: "",
-        pubYear: "",
+        googleId: req.body.books,
+        title: bookJson.title,
+        author: bookJson.authors[0],
+        pubYear: getPublicationYear(bookJson.publishedDate),
+        imageUrl: bookJson.imageLinks.thumbnail,
     };
-    if (req.body.books === "manualEntry") {
-    } else {
-        var searchEndpoint = "https://openlibrary.org/search.json?language=eng";
-        searchEndpoint += "&" + req.body.books;
-        console.log(`Retrieving book information from ${searchEndpoint}`);
-        const searchResponse = await axios.get(searchEndpoint);
-        const bookJson = cleanBookInfo(searchResponse.data.docs[0]);
-        newBook.title = bookJson.title;
-        newBook.author = bookJson.author_name;
-        newBook.pubYear = bookJson.first_publish_year;
-        newBook.imageUrl = bookJson.imageUrl;
-        newBook.imageUrlMedium = bookJson.imageUrl.replace("-S.jpg","-M.jpg");
-    }
     console.log(newBook);
     res.render("add_details.ejs", {book: newBook, family: familyMembers});
 })
 
 app.post("/books/manual", async (req, res) => {
+    console.log("Manually add book details");
     const formInput = req.body;
     console.log(formInput);
     const newBook = {
@@ -95,7 +82,13 @@ app.post("/books/save", async (req, res) => {
     const formInput = req.body;
     console.log(formInput);
     const bookResponse = await Book.findOrCreate({
-        where: {title: formInput.title, author: formInput.author, pubYear: formInput.bookYear, imageUrl: formInput.imageUrl}
+        where: {
+            title: formInput.title,
+            author: formInput.author,
+            pubYear: formInput.bookYear,
+            imageUrl: formInput.imageUrl,
+            googleBooksId: formInput.googleId,
+        }
     });
     const newBook = bookResponse.map(item => item.dataValues)[0];
     console.log(newBook);
