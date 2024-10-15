@@ -1,94 +1,99 @@
 <%- include('partials/header.ejs'); -%>
 
 <div>
-    <main>
-        <div class="py-3 text-center">
-          <h3>Finalize Your Recommendation</h3>
-          <p class="lead">Add your notes, confirm the book details, and add ACA year and recommender information.</p>
+  <main>
+    <div class="py-3 text-center">
+      <% if (locals.rec) { %>
+        <h3>Finalize Your Recommendation</h3>
+        <p class="lead">Add your notes, confirm the book details, and add ACA year and recommender information.</p>
+      <% } else { %>
+        h3>Edit Your Recommendation</h3>
+        <p class="lead">Edit your recommendation.</p>
+      <% } %>
+    </div>
+    <div class="container">
+      <div class="row g-5">
+        <% if (locals.rec) { %>
+          <form class="needs-validation" novalidate="" action="/recommendations/<%=rec.id%>/save-edit" method="post">
+        <% } else { %>
+          <form class="needs-validation" novalidate="" action="/books/save" method="post">
+        <% } %>
+        <div class="col-md-5 col-lg-4 order-md-last">
+          <h4 class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-primary">Cover Image</span>
+          </h4>
+          <ul class="list-group mb-3">
+            <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
+              <div class="text-success">
+                <img src="<%=book.imageUrl%>">
+                <h6 class="my-0">Image URL</h6>
+                <input type="text" name="imageUrl" class="form-control" value="<%= book.imageUrl %>">
+                <input type="text" name="googleId" class="form-control" value="<%= book.googleId %>" hidden>
+              </div>
+            </li>
+          </ul>
         </div>
-        <div class="container">    
-        <div class="row g-5">
-          <div class="col-md-5 col-lg-4 order-md-last">
-            <h4 class="d-flex justify-content-between align-items-center mb-3">
-              <span class="text-primary">Cover Image</span>
-            </h4>
-            <form class="needs-validation" novalidate="" action="/books/save" method="post">
-            <ul class="list-group mb-3">
-              <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
-                <div class="text-success">
-                  <img src="<%=book.imageUrl%>">
-                  <h6 class="my-0">Image URL</h6>
-                  <input type="text" name="imageUrl" class="form-control" value="<%= book.imageUrl %>">
-                  <input type="text" name="googleId" class="form-control" value="<%= book.googleId %>" hidden>
+        <div class="col-md-7 col-lg-8">
+          <h5 class="mb-3">Book Details</h5>
+          <div class="row g-3">
+              <div class="col-sm-5">
+                  <label for="author" class="form-label">Author Name</label>
+                  <input type="text" name="author" class="form-control" value="<%= book.author %>" required="">
+                <div class="invalid-feedback">
+                  Author name is required.
                 </div>
-              </li>
-            </ul>
-          </div>
-          <div class="col-md-7 col-lg-8">
-            <h5 class="mb-3">Book Details</h5>
-              <div class="row g-3">
-                <div class="col-sm-5">
-                    <label for="author" class="form-label">Author Name</label>
-                    <input type="text" name="author" class="form-control" value="<%= book.author %>" required="">
-                  <!-- <label for="firstName" class="form-label">First name</label>
-                  <input type="text" class="form-control" id="firstName" placeholder="" value="" required=""> -->
-                  <div class="invalid-feedback">
-                    Author name is required.
-                  </div>
-                </div>
-    
-                <div class="col-sm-5">
-                  <label for="title" class="form-label">Book Title</label>
-                  <input type="text" name="title" class="form-control" value="<%= book.title %>" required="">
-                  <div class="invalid-feedback">
-                    Book title is required.
-                  </div>
-                </div>
+              </div>
 
-                <div class="col-sm-2">
-                  <label for="bookYear" class="form-label">Publication Year</label>
-                  <input type="number" name="bookYear" class="form-control" value="<%= book.pubYear %>" required="">
-                  <div class="invalid-feedback">
-                      Publication year is required.
-                  </div>
+              <div class="col-sm-5">
+                <label for="title" class="form-label">Book Title</label>
+                <input type="text" name="title" class="form-control" value="<%= book.title %>" required="">
+                <div class="invalid-feedback">
+                  Book title is required.
+                </div>
+              </div>
+
+              <div class="col-sm-2">
+                <label for="bookYear" class="form-label">Publication Year</label>
+                <input type="number" name="bookYear" class="form-control" value="<%= book.pubYear %>" required="">
+                <div class="invalid-feedback">
+                    Publication year is required.
+                </div>
+              </div>
+          </div>
+          <hr class="my-4">
+          <h5 class="mb-3">ACA Details</åh5>
+          <div class="row g-3">
+            <div class="col-sm-2">
+                <label for="acaYear" class="form-label">ACA Year</label>
+                <input type="number" name="acaYear" class="form-control" value=<% if (locals.rec) { %> <%=rec.yearAcaYear%> <% } else {%> "2024" <% } %> required="">
+                <div class="invalid-feedback">
+                    ACA year is required.
                 </div>
             </div>
-            <hr class="my-4">
-            <h5 class="mb-3">ACA Details</h5>
-                <div class="row g-3">
-                <div class="col-sm-2">
-                    <label for="acaYear" class="form-label">ACA Year</label>
-                    <input type="number" name="acaYear" class="form-control" value="2024" required="">
-                    <div class="invalid-feedback">
-                        ACA year is required.
-                    </div>
-                </div>
-    
-                <div class="col-4">
-                  <label for="recommendedBy" class="form-label">Recommended By</label>
-                  <select class="form-select" name="recommendedBy" id="family-select" required="">
-                    <option value="">Choose...</option>
-                    <% family.forEach((name => { %>
-                        <option value="<%= name %>"><%= name %></option>
-                    <% })) %>
-                  </select>
-                  <div class="invalid-feedback">
-                    Please indicate who recommended this book.
-                  </div>
-                </div>
+
+            <div class="col-4">
+              <label for="recommendedBy" class="form-label">Recommended By</label>
+              <select class="form-select" name="recommendedBy" id="family-select" required=""
+                <option value="">Choose...</option>
+                <% family.forEach((name => { %>
+                    <option value="<%= name %>" <%if (locals.rec && (rec.family.firstName === name)) {%> selected="selected"<%}%> ><%= name %></option>
+                <% })) %>
+              </select>
+              <div class="invalid-feedback">
+                Please indicate who recommended this book.
               </div>
-    
-              <hr class="my-4">
-    
-              <div class="col-12">
-                <textarea name="acaNotes" placeholder="Enter notes here" class="form-control"></textarea>
-              </div>
-              <button class="btn btn-primary btn-lg my-4" type="submit">Save Recommendation</button>
-            </form>
+            </div>
           </div>
+          <hr class="my-4">
+          <div class="col-12">
+            <textarea name="acaNotes" placeholder="Enter notes here" class="form-control"><% if (locals.rec) { %> <%=rec.notes %> <% } %></textarea>
           </div>
+          <button class="btn btn-primary btn-lg my-4" type="submit">Save Recommendation</button>
         </div>
-      </main>
+        </form>
+      </div>
+    </div>
+  </main>
 </div>
 
 <%- include('partials/footer.ejs'); -%>

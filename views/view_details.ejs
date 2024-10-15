@@ -1,0 +1,30 @@
+<%- include('partials/header.ejs'); -%>
+
+<div>
+    <main>
+        <div class="py-3 text-center">
+          <h3><%= rec.book.title %> by <%= rec.book.author %> (<%= rec.book.pubYear %>)</h3>
+        </div>
+        <div class="container">    
+        <div class="row g-5">
+          <div class="col-md-5 col-lg-4 order-md-first">
+            <div class="row mb-3">
+                <img class="cover-image" src="<%=rec.book.imageUrl%>">
+            </div>
+            <div class="row justify-content-center mb-5">
+                <a type="button" class="btn btn-outline-danger" href="/recommendations/<%= rec.id %>/edit">Edit</a>
+            </div>
+          </div>
+          <div class="col-md-7 col-lg-8">
+            <h5 class="mb-3">Recommended by <%= rec.family.firstName %> in <%= rec.yearAcaYear %></h5>
+              <div class="col-12">
+                <p class="card-text overflow-scroll"><%= rec.notes %></p>
+              </div>
+          </div>
+          
+        </div>
+        </div>
+      </main>
+</div>
+
+<%- include('partials/footer.ejs'); -%>

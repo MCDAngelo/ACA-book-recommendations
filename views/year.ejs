@@ -2,18 +2,26 @@
 
 <div class="container mb-5">
     <% if (locals.error) { %>
-        <h2> 🚧 COMING SOON 🚧 </h2>
-        <p class="error"><%= error %></p>
+        <div class="container">
+            <h4 class="error"><%= error %></h4>
+        </div>
     <% } else if (locals.recommendations) { %>
         <h2>Books Recommended in <%= recommendations[0].yearAcaYear %> </h2>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
         <% recommendations.forEach((rec) => { %>
-            <div class="card" style="width: 20rem;">
-                <img src="<%= rec.book.imageUrl %>" class="card-img-top" alt="...">
-                <div class="card-body">
-                  <p class="card-text"><%= rec.book.title %> by <%= rec.book.author %> (<%= rec.book.pubYear %>)</p>
+            <div class="card flip-card" onclick="location.href=location.origin + '/recommendations/<%=rec.id%>'">
+                <div class="card flip-card-inner">
+                  <img class="card flip-card-front object-fit-cover" src="<%= rec.book.imageUrl %>" alt="book cover for <%= rec.book.title %>">
+                  <div class="card flip-card-back">
+                    <h6 class="card-title"><%= rec.book.title %> by <%= rec.book.author %> (<%= rec.book.pubYear %>)</h6>
+                    <p class="card-text">Recommended by <%= rec.family.firstName %></p>
+                    <h6 class="card-title">Notes:</h6>
+                    <p class="card-text overflow-scroll"><%= rec.notes %></p>
+                  </div>
                 </div>
               </div>
         <% }); %>
+    </div>
     <% }%>
 </div>
 

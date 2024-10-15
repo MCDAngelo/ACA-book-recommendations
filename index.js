@@ -101,12 +101,79 @@ app.post("/books/save", async (req, res) => {
         familyId: familyMember.id,
         bookId: newBook.id,
         yearAcaYear: formInput.acaYear,
-        notes: formInput.acaNotes  
+        notes: formInput.acaNotes
     });
     console.log("Added new recommendation:");
     console.log(newRecommendation.toJSON());
     res.redirect("/");
 })
+
+app.post("/recommendations/:recId/save-edit", async (req, res) => {
+    const formInput = req.body;
+    console.log("Form Input");
+    console.log(formInput);
+    const rec = await Recommendation.findByPk(parseInt(req.params.recId));
+    const familyMember = await Family.findOne({
+        attributes: ['id'],
+        where: { firstName: formInput.recommendedBy}
+    });
+    const book = await Book.findByPk(rec.bookId);
+    rec.set({
+        familyId: familyMember.id,
+        yearAcaYear: formInput.acaYear,
+        notes: formInput.acaNotes,
+    });
+    book.set({
+        title: formInput.title,
+        author: formInput.author,
+        pubYear: formInput.bookYear,
+        imageUrl: formInput.imageUrl,
+    })
+    await rec.save();
+    await book.save();
+    console.log("The following changes have been saved:");
+    console.log(rec.toJSON());
+    console.log(book.toJSON());
+    res.redirect(`/recommendations/${rec.id}`);
+})
+
+app.get("/recommendations/:recId", async (req, res) => {
+    console.log(parseInt(req.params.recId));
+    try {
+        const recommendations = await Recommendation.findAll({
+            where: {id: parseInt(req.params.recId)},
+            include: [Book, Family],
+        })
+        console.log(recommendations.map(rec => rec.toJSON()));
+        if (recommendations.length > 0) {
+            res.render("view_details.ejs", {rec: recommendations.map(rec => rec.toJSON())[0]});
+        } else {
+            res.render("view_details.ejs", {error: `No matches, search for another book.`});
+        }
+    } catch (err) {
+        console.error(err)
+        res.render("view_details.ejs", {error: `No matches, search for another book.`});
+    };
+});
+
+app.get("/recommendations/:recId/edit", async (req, res) => {
+    console.log(parseInt(req.params.recId));
+    try {
+        const recommendation = await Recommendation.findByPk(parseInt(req.params.recId),
+            {include: [Book, Family],}
+        )
+        const book = recommendation.toJSON().book
+        console.log(recommendation.toJSON());
+        if (recommendation instanceof Recommendation) {
+            res.render("add_details.ejs", {book: book, family: familyMembers, rec: recommendation.toJSON()});
+        } else {
+            res.render("add_details.ejs", {error: `No matches, search for another book.`});
+        }
+    } catch (err) {
+        console.error(err)
+        res.render("add_details.ejs", {error: `No matches, search for another book.`});
+    };
+});
 
 app.get("/years", async (req, res) => {
     const years = await getYears();
@@ -119,7 +186,7 @@ app.get("/years/:year", async (req, res) => {
     try {
         const recommendations = await Recommendation.findAll({
             where: {yearAcaYear: parseInt(req.params.year)},
-            include: Book,
+            include: [Book, Family],
         })
         console.log(recommendations.map(rec => rec.toJSON()));
         if (recommendations.length > 0) {
