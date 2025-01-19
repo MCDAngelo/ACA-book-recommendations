@@ -8,22 +8,22 @@
       <h2>Search Results</h2>
       <p class="lead">Here are the results from your search. Pick a book to continue to the details page, or go back to add the information manually.</p>
     </div>
-
-    <div class="row g-5">
-      <div class="col-md-7 col-lg-8">
-        <h4 class="mb-3">Search Results</h4>
-        <form action="/books/add" method="post"">
-            <% books.forEach((book) => { %>
-                <div class="mt-1">
-                    <img src="<%=book.volumeInfo.imageLinks.thumbnail%>">
-                    <input type="radio" name="books" id="<%=book.id%>" value="<%=book.id%>">
-                    <label for="<%=book.id%>"><%=book.volumeInfo.title%> - <%=book.volumeInfo.authors%> (<%=book.volumeInfo.publishedDate%>) </label>
-                </div>
-            <% }) %>
-          <button class="btn btn-primary btn-lg" type="submit">Continue to add notes on your recommendation.</button>
-        </form>
+    <div class="container">
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+          <% books.map((book, i) => { %>
+            <div class="card flip-card mx-2">
+              <form class="card flip-card" action="/books/add/<%=book.id%>" method="post">
+              <input type="image" class="object-fit-cover" src="<%=book.volumeInfo.imageLinks.thumbnail%>" id="<%=book.id%>">
+              <div class="card-body">
+              <p class="card-text mb-0"><strong>Title: </strong><%=book.volumeInfo.title%></p>
+              <p class="card-text mt-0"><strong>Author: </strong><%=book.volumeInfo.authors%></p>
+              </div>
+              </form>
+              </div>
+          <% }) %>
       </div>
     </div>
   </main>
+</div>
 
 <%- include('partials/footer.ejs'); -%>

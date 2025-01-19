@@ -166,11 +166,11 @@ app.post("/books/find", async (req, res) => {
     }
 });
 
-app.post("/books/add", async(req, res) => {
+app.post("/books/add/:googleBookId", async(req, res) => {
     var bookJson = null;
     console.log(req.body);
     var searchEndpoint = "https://www.googleapis.com/books/v1/volumes/";
-    searchEndpoint += req.body.books + "?key=" + process.env.GOOGLE_BOOKS_API_KEY;
+    searchEndpoint += req.params.googleBookId + "?key=" + process.env.GOOGLE_BOOKS_API_KEY;
     console.log(`Retrieving book information from ${searchEndpoint}`);
     try {
         const searchResponse = await axios.get(searchEndpoint);
