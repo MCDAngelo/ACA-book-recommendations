@@ -4,27 +4,25 @@
   <main>
     <div class="py-3 text-center">
       <% if (locals.rec) { %>
-        <h3>Finalize Your Recommendation</h3>
-        <p class="lead">Add your notes, confirm the book details, and add ACA year and recommender information.</p>
+        <h3>Edit Your Recommendation</h3>
+        <p class="lead">Update book information or recommendation notes here.</p>
       <% } else { %>
-        h3>Edit Your Recommendation</h3>
-        <p class="lead">Edit your recommendation.</p>
+        <h3>Finalize Your Recommendation</h3>
+        <p class="lead">Add your notes, confirm the book details, add ACA year, and the recommender information.</p>
       <% } %>
     </div>
     <div class="container">
-      <div class="row g-5">
-        <% if (locals.rec) { %>
-          <form class="needs-validation" novalidate="" action="/recommendations/<%=rec.id%>/save-edit" method="post">
+    <% if (locals.rec) { %>
+      <form class="needs-validation" novalidate="" action="/recommendations/<%=rec.id%>/save-edit" method="post">
         <% } else { %>
           <form class="needs-validation" novalidate="" action="/books/save" method="post">
-        <% } %>
-        <div class="col-md-5 col-lg-4 order-md-last">
-          <h4 class="d-flex justify-content-between align-items-center mb-3">
-            <span class="text-primary">Cover Image</span>
-          </h4>
+            <% } %>
+      <div class="row g-5">
+        <div class="col-md-4 col-lg-3 order-md-last">
           <ul class="list-group mb-3">
             <li class="list-group-item d-flex justify-content-between bg-body-tertiary">
               <div class="text-success">
+                <h5 class="mb-3">Cover Art</h5>
                 <img src="<%=book.imageUrl%>">
                 <h6 class="my-0">Image URL</h6>
                 <input type="text" name="imageUrl" class="form-control" value="<%= book.imageUrl %>">

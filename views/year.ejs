@@ -13,7 +13,7 @@
                 <div class="card flip-card-inner">
                   <img class="card flip-card-front object-fit-cover" src="<%= rec.book.imageUrl %>" alt="book cover for <%= rec.book.title %>">
                   <div class="card flip-card-back">
-                    <h6 class="card-title"><%= rec.book.title %> by <%= rec.book.author %> (<%= rec.book.pubYear %>)</h6>
+                    <h6 class="card-title m-2"><%= rec.book.title %> by <%= rec.book.author %> (<%= rec.book.pubYear %>)</h6>
                     <p class="card-text">Recommended by <%= rec.family.firstName %></p>
                     <h6 class="card-title">Notes:</h6>
                     <p class="card-text overflow-scroll"><%= rec.notes %></p>
@@ -22,7 +22,9 @@
               </div>
         <% }); %>
     </div>
-    <% }%>
+    <% } else { %>
+      <h3> No books stored, add a book <a href="/books/new">here</a></h3>
+    <% } %>
 </div>
 
 <%- include('partials/footer.ejs'); -%>

@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
+import { stringSimilarity } from "string-similarity-js";
 import {Book, Family, Recommendation, Year, getFamily, getYears, sequelize} from "./models.js";
 
 const port = 3000;
@@ -11,6 +12,9 @@ const familyMembers = await getFamily();
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
+/////////////////////
+// GET METHODS
+/////////////////////
 app.get("/", async (req, res) => {
     res.render("index.ejs");
 });
@@ -25,7 +29,106 @@ function getPublicationYear(pubDateStr) {
     return pubDate.getFullYear();
 }
 
+app.get("/recommendations/:recId", async (req, res) => {
+    var recommendations = null;
+    var errorMsg = null;
+    console.log(parseInt(req.params.recId));
+    try {
+        recommendations = await Recommendation.findAll({
+            where: {id: parseInt(req.params.recId)},
+            include: [Book, Family],
+        })
+        console.log(recommendations.map(rec => rec.toJSON()));
+    } catch (err) {
+        console.error(err)
+        errorMsg = "No matches, search for another recommendation";
+    };
+    if (errorMsg | recommendations.length < 1) {
+        res.render("view_details.ejs", {error: errorMsg});
+    } else {
+        res.render("view_details.ejs", {rec: recommendations.map(rec => rec.toJSON())[0]});
+    }
+});
+
+app.get("/recommendations/:recId/edit", async (req, res) => {
+    var recommendation = null;
+    var errorMsg = null;
+    console.log(parseInt(req.params.recId));
+    try {
+        recommendation = await Recommendation.findByPk(parseInt(req.params.recId),
+            {include: [Book, Family],}
+        )
+    } catch (err) {
+        console.error(err)
+        errorMsg = "Sorry, can't find that recommendation"
+    };
+    if (recommendation instanceof Recommendation) {
+        const book = recommendation.toJSON().book
+        console.log(book);
+        res.render("add_details.ejs", {book: book, family: familyMembers, rec: recommendation.toJSON()});
+    } else {
+        res.render("add_details.ejs", {error: errorMsg});
+    }
+});
+
+app.get("/years", async (req, res) => {
+    var recs = null;
+    var years = null;
+    var errorMsg = null;
+    try {
+        var all_years = await getYears();
+        recs = await Recommendation.findAll({
+            include: [Book],
+        });
+        years = all_years.map(y => ({
+            ...y,
+            nBooks: 0
+        }));
+    }  catch (err) {
+        errorMsg = "Hmm, I seem to have hit a snag, try refreshing.";
+        console.log(err);
+    } 
+    if (errorMsg) {
+        res.render("years.ejs", {error: errorMsg});
+    }  else {
+        var recJSON = recs.map(r => r.toJSON());
+        console.log(recJSON);
+        recJSON.reduce((p, c) => {
+            var bookYear = years.find(y => y.acaYear === c.yearAcaYear)
+            bookYear.nBooks += 1
+        }, {});
+        console.log(years); 
+        res.render("years.ejs", {years: years});
+    }
+
+})
+
+app.get("/years/:year", async (req, res) => {
+    var errorMsg = null;
+    var recommendations = null;
+    console.log(parseInt(req.params.year));
+    try {
+        recommendations = await Recommendation.findAll({
+            where: {yearAcaYear: parseInt(req.params.year)},
+            include: [Book, Family],
+        })
+        console.log(recommendations.map(rec => rec.toJSON()));
+    } catch (err) {
+        console.error(err);
+        errorMsg = "No matches, pick another year or add a recommendation";
+    };
+    if (recommendations.length > 0) {
+        res.render("year.ejs", {recommendations: recommendations.map(rec => rec.toJSON())});
+    } else {
+        res.render("year.ejs", {error: errorMsg});
+    }
+});
+
+/////////////////////
+// POST METHODS
+/////////////////////
 app.post("/books/find", async (req, res) => {
+    var errorMsg = "No books found, try again."
     console.log("Looking for book");
     console.log(req.body);
     var searchEndpoint = "https://www.googleapis.com/books/v1/volumes?q=";
@@ -39,30 +142,56 @@ app.post("/books/find", async (req, res) => {
     }
     searchEndpoint += "&key=" + process.env.GOOGLE_BOOKS_API_KEY;
     console.log(`Searching for books from ${searchEndpoint}`);
-    const response = await axios.get(searchEndpoint);
-    var rawBooks = response.data.items;
-    var filteredBooks = rawBooks.filter((book) => "imageLinks" in book.volumeInfo);
-    console.log(filteredBooks.length);
-    res.render("confirm_book.ejs", {books:filteredBooks})
+    try {
+        const response = await axios.get(searchEndpoint);
+        var rawBooks = response.data.items;
+    } catch (err) {
+        console.log(err)
+        res.render("add_book.ejs", {error: errorMsg})
+    };
+    if (rawBooks) {
+        var filteredBooks = rawBooks.filter(
+            (book) => ("imageLinks" in book.volumeInfo & stringSimilarity(req. body.title, book.volumeInfo.title) > 0.7)
+        );
+        if (filteredBooks.length > 0) {
+            console.log(`${filteredBooks.length} books found.`)
+            res.render("confirm_book.ejs", {books:filteredBooks})
+        } else {
+            console.log("No books meeting the search criteria.")
+           res.render("add_book.ejs", {error: errorMsg})
+        }
+    } else {
+        console.log("No books meeting the search criteria.")
+        res.render("add_book.ejs", {error: errorMsg})
+    }
 });
 
 app.post("/books/add", async(req, res) => {
+    var bookJson = null;
     console.log(req.body);
     var searchEndpoint = "https://www.googleapis.com/books/v1/volumes/";
     searchEndpoint += req.body.books + "?key=" + process.env.GOOGLE_BOOKS_API_KEY;
     console.log(`Retrieving book information from ${searchEndpoint}`);
-    const searchResponse = await axios.get(searchEndpoint);
-    const bookJson = searchResponse.data.volumeInfo;
-    console.log(bookJson)
-    const newBook = {
-        googleId: req.body.books,
-        title: bookJson.title,
-        author: bookJson.authors[0],
-        pubYear: getPublicationYear(bookJson.publishedDate),
-        imageUrl: bookJson.imageLinks.thumbnail,
-    };
-    console.log(newBook);
-    res.render("add_details.ejs", {book: newBook, family: familyMembers});
+    try {
+        const searchResponse = await axios.get(searchEndpoint);
+        bookJson = searchResponse.data.volumeInfo;
+        console.log(bookJson)
+    } catch (err) {
+        var errorMsg = "Oops, there was a problem retrieving the book information from Google"
+        console.log(err)
+        res.render("add_book.ejs", {error: errorMsg})
+    }
+    if (bookJson) {
+        const newBook = {
+            googleId: req.body.books,
+            title: bookJson.title,
+            author: bookJson.authors[0],
+            pubYear: getPublicationYear(bookJson.publishedDate),
+            imageUrl: bookJson.imageLinks.thumbnail,
+        };
+        console.log(newBook);
+        res.render("add_details.ejs", {book: newBook, family: familyMembers});
+    }
 })
 
 app.post("/books/manual", async (req, res) => {
@@ -105,7 +234,7 @@ app.post("/books/save", async (req, res) => {
     });
     console.log("Added new recommendation:");
     console.log(newRecommendation.toJSON());
-    res.redirect("/");
+    res.redirect(`/recommendations/${newRecommendatin.id}`);
 })
 
 app.post("/recommendations/:recId/save-edit", async (req, res) => {
@@ -137,68 +266,7 @@ app.post("/recommendations/:recId/save-edit", async (req, res) => {
     res.redirect(`/recommendations/${rec.id}`);
 })
 
-app.get("/recommendations/:recId", async (req, res) => {
-    console.log(parseInt(req.params.recId));
-    try {
-        const recommendations = await Recommendation.findAll({
-            where: {id: parseInt(req.params.recId)},
-            include: [Book, Family],
-        })
-        console.log(recommendations.map(rec => rec.toJSON()));
-        if (recommendations.length > 0) {
-            res.render("view_details.ejs", {rec: recommendations.map(rec => rec.toJSON())[0]});
-        } else {
-            res.render("view_details.ejs", {error: `No matches, search for another book.`});
-        }
-    } catch (err) {
-        console.error(err)
-        res.render("view_details.ejs", {error: `No matches, search for another book.`});
-    };
-});
 
-app.get("/recommendations/:recId/edit", async (req, res) => {
-    console.log(parseInt(req.params.recId));
-    try {
-        const recommendation = await Recommendation.findByPk(parseInt(req.params.recId),
-            {include: [Book, Family],}
-        )
-        const book = recommendation.toJSON().book
-        console.log(recommendation.toJSON());
-        if (recommendation instanceof Recommendation) {
-            res.render("add_details.ejs", {book: book, family: familyMembers, rec: recommendation.toJSON()});
-        } else {
-            res.render("add_details.ejs", {error: `No matches, search for another book.`});
-        }
-    } catch (err) {
-        console.error(err)
-        res.render("add_details.ejs", {error: `No matches, search for another book.`});
-    };
-});
-
-app.get("/years", async (req, res) => {
-    const years = await getYears();
-    console.log(years);
-    res.render("years.ejs", {years: years});
-})
-
-app.get("/years/:year", async (req, res) => {
-    console.log(parseInt(req.params.year));
-    try {
-        const recommendations = await Recommendation.findAll({
-            where: {yearAcaYear: parseInt(req.params.year)},
-            include: [Book, Family],
-        })
-        console.log(recommendations.map(rec => rec.toJSON()));
-        if (recommendations.length > 0) {
-            res.render("year.ejs", {recommendations: recommendations.map(rec => rec.toJSON())});
-        } else {
-            res.render("year.ejs", {error: `No matches, pick another year or add a past recommendation.`});
-        }
-    } catch (err) {
-        console.error(err)
-        res.render("year.ejs", {error: `No matches, pick another year or add a past recommendation.`});
-    };
-});
 
 app.listen(port, () => {
     console.log(`Server running on port localhost:${port}`);

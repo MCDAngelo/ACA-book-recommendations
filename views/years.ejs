@@ -3,16 +3,21 @@
 
 <main class="flex-shrink-0">
     <div class="container">
-      <h1 class="mt-5">Past Years</h1>
-      <div class="d-flex flex-row p-2 gap-2 py-md-3 align-items-center justify-content-center">
+      <h2 class="mt-5">Past Years</h1>
+        <% if (locals.error) { %>
+          <h5 class="error-message"><%= error %></h5>
+          <% } else { %> 
+      <div class="d-flex flex-row p-2 gap-4 py-md-3 align-items-center justify-content-center">
         <% years.forEach(year => { %>
-          <div class="card" onclick="location.href='years/<%=year.acaYear%>'" style="width: 10rem; background-color: <%=year.pantoneColorHex+'50'%>;">
+          <div class="card" onclick="location.href='years/<%=year.acaYear%>'" style="width: 20rem; background-color: #228b2280;">
             <div class="card-body">
-              <h3 class="card-title"><%=year.acaYear%></h3>
+              <h2 class="card-title" style="text-align: center"><%=year.acaYear%></h2>
+              <p style="text-align: center;"> <%=year.nBooks%> <%= year.nBooks === 1 ? "book" : "books" %> recommended</p>
             </div>
           </div>
         <% }) %>
       </div>
+      <% } %>
     </div>
 </main>
 

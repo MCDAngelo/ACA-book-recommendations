@@ -9,7 +9,7 @@
     width: 250px;
     height: 350px;
     border-style: none; /* 1px solid #f1f1f1;*/
-    perspective: 1000px; /* Remove this if you don't want the 3D effect */
+    /*perspective: 1000px; /* Remove this if you don't want the 3D effect */
   }
 
   /* This container is needed to position the front and back side */
@@ -49,4 +49,10 @@
     background-color: whitesmoke;
     color: forestgreen;
     transform: rotateY(180deg);
+  }
+
+
+  .error-message {
+    color: darkred; 
+    font-style:italic;
   }

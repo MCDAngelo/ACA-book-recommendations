@@ -3,8 +3,12 @@
 <div>
     <main class="mb-5">
         <div class="py-3 text-center">
+          <% if (locals.error) { %>
+          <h5 class="error-message"><%= error %></h5>
+          <% } %>  
           <h3>Add a book</h3>
-          <p class="lead">Searching for a book to retrieve metadata, including cover art, or enter the information manually.</p>
+          <p class="lead">Search for a book to use metadata from Google Books, </p>
+          <p class="lead"> or enter the information manually.</p>
         </div>
         <div class="container">
           <div class="d-grid gap-2 d-md-flex justify-content-center pb-4">
@@ -26,7 +30,7 @@
                 </div>
                 <!-- OR ADD IN ISBN? DIRECTLY -->
             </div>
-            <button class="btn btn-primary btn-lg my-4" type="submit">Continue</button>
+            <button class="btn btn-primary btn-lg my-4" type="submit">Search</button>
             </form>
           </div>
           <div class="col" id="manualButtonForm" hidden>
@@ -49,7 +53,7 @@
                     <input type="url" name="imageUrl" class="form-control" placeholder="">
                 </div>
             </div>
-            <button class="btn btn-primary btn-lg my-4" type="submit">Continue</button>
+            <button class="btn btn-secondary btn-lg my-4" type="submit">Continue</button>
             </form>
           </div>
         </div>
